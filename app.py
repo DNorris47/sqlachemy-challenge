@@ -37,49 +37,77 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
-        f"/api/v1.0/names<br/>"
-        f"/api/v1.0/passengers"
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/start<br/>"
+        f"/api/v1.0/<start>/<end>
+
+       
     )
 
 
-@app.route("/api/v1.0/names")
-def names():
+@app.route("/api/v1.0/precipitation")
+def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of all passenger names"""
-    # Query all passengers
-    results = session.query(Passenger.name).all()
+    """Return a list of all precipitation"""
+    # Query all preciptiation
+    results = session.query(measurement.date, measurement.prcp).filter(measurement.date >= "2016-08-23").all
+    dict1 = list(np.ravel(results1))
 
+    
+    # dict1 = {}
+    # for temps  in results1:
+    #     temps_dict = {}
+    #     temps_dict[date] = meausrement.date
+    #     temps_dict[tobs] = measurement.tobs
+    #     dict1.append(temps_dict)                 
+
+    return jsonify(dict1)
     session.close()
 
-    # Convert list of tuples into normal list
-    all_names = list(np.ravel(results))
 
-    return jsonify(all_names)
-
-
-@app.route("/api/v1.0/passengers")
-def passengers():
-    # Create our session (link) from Python to the DB
+@app.route("/api/v1.0/stations")
+def stations():
+    
     session = Session(engine)
 
-    """Return a list of passenger data including the name, age, and sex of each passenger"""
-    # Query all passengers
-    results = session.query(Passenger.name, Passenger.age, Passenger.sex).all()
+    results2 = session.query(Station.station, Station.name).all()
 
+    sec_dict = list(np.ravel(results2))
+    dict2 = []
+    for ttl_stations in results2:
+        station_dict["station"] = Station.station
+        station_dict["name"] = Station.name
+        dict2.append(station_dict)
+
+      
+    return jsonify(dict2)  
     session.close()
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-    all_passengers = []
-    for name, age, sex in results:
-        passenger_dict = {}
-        passenger_dict["name"] = name
-        passenger_dict["age"] = age
-        passenger_dict["sex"] = sex
-        all_passengers.append(passenger_dict)
+     @app.route("/api/v1.0/tobs")
+def tobs():
+    
+    session = Session(engine)
 
-    return jsonify(all_passengers)
+    results3 = session.query(measurement.date, measurement.tobs).all()
+
+    temps_dict = list(np.ravel(results3))
+
+    dict3 = []
+    for ttl_stations in results3:
+        station_dict["station"] = Station.station
+        station_dict["name"] = Station.name
+        dict3.append(station_dict)
+
+      
+    return jsonify(dict3)  
+    session.close()
+    
+
+    return jsonify(temp_dict)
 
 
 if __name__ == '__main__':
